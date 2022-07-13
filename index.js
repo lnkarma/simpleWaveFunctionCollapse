@@ -15,9 +15,11 @@ const dirs = [
 const possibleChars = [...Object.keys(chars)];
 
 const dim = {
-  rows: 10,
-  columns: 30,
+  rows: process.argv[2] || 10,
+  columns: process.argv[3] || 10,
 };
+
+const interval = process.argv[4] || 25;
 
 const grid = Array.from({ length: dim.rows }, () =>
   Array.from({ length: dim.columns }, () => ({
@@ -29,17 +31,25 @@ const grid = Array.from({ length: dim.rows }, () =>
 let minEntropyArray = [];
 const selectRandom = (arr) => arr[Math.floor(Math.random() * arr.length)];
 
-const print = (grid) =>
+const print = (grid) => {
   grid.forEach((row) => {
     const s = [];
-    row.forEach((cell) => s.push(cell.possibleChars[0]));
+    row.forEach((cell) =>
+      s.push(cell.isCollapsed ? cell.possibleChars[0] : " ")
+    );
     console.log(s.join(""));
-    // console.log(s);
   });
+};
 
-do {
+const timer = setInterval(() => {
+  print(grid);
   minEntropyArray = listMinEntropyArray();
-  if (minEntropyArray.length === 0) break;
+  if (minEntropyArray.length === 0) {
+    clearInterval(timer);
+    return;
+  }
+
+  process.stdout.write("\u001b[" + dim.rows + "A\u001b[1G");
 
   randomMinEntropyCellIndex = selectRandom(minEntropyArray);
   minEntropyCell =
@@ -47,9 +57,7 @@ do {
   minEntropyCell.isCollapsed = true;
   minEntropyCell.possibleChars = [selectRandom(minEntropyCell.possibleChars)];
   updateAdjacentCellMinEntropy(randomMinEntropyCellIndex);
-} while (minEntropyArray.length > 0);
-
-print(grid);
+}, interval);
 
 function listMinEntropyArray() {
   let minEntropy = possibleChars.length;
