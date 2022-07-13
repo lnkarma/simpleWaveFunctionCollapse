@@ -14,10 +14,13 @@ const dirs = [
 
 const possibleChars = [...Object.keys(chars)];
 
-const dim = 30;
+const dim = {
+  rows: 10,
+  columns: 30,
+};
 
-const grid = Array.from({ length: dim }, () =>
-  Array.from({ length: dim }, () => ({
+const grid = Array.from({ length: dim.rows }, () =>
+  Array.from({ length: dim.columns }, () => ({
     isCollapsed: false,
     possibleChars: [...possibleChars],
   }))
@@ -70,7 +73,7 @@ function updateAdjacentCellMinEntropy([rowIndex, cellIndex]) {
   dirs.forEach((dir, dirIndex) => {
     r = rowIndex + dir[0];
     c = cellIndex + dir[1];
-    if (r < 0 || r >= dim || c < 0 || c >= dim) return;
+    if (r < 0 || r >= dim.rows || c < 0 || c >= dim.columns) return;
     adjCell = grid[r][c];
     if (adjCell.isCollapsed) return;
     selectedChar = cell.possibleChars[0];
